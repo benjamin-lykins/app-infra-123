@@ -41,7 +41,13 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -var-file=tfvars/app-infra-123-dev.tfvars -input=false
-      
+        run: terraform plan -var-file=tfvars/app-infra-123-dev.tfvars -input=false -out=${{ github.run_id }}.tfplan
+
+      - name: Terraform Approval
+        uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ secrets.GITHUB_TOKEN }}
+          approvers: benjamin-lykins
+
       - name: Terraform Apply
-        run: terraform apply -auto-approve -var-file=tfvars/app-infra-123-dev.tfvars -input=false
+        run: terraform apply -auto-approve -var-file=tfvars/app-infra-123-dev.tfvars  -input=false ${{ github.run_id }}.tfplan
