@@ -75,7 +75,6 @@ jobs:
           issue-body: |
             "Terraform Plan is ready for review. Please approve to proceed with Terraform Apply."
 
-
             ${{ steps.get_file_content.outputs.content }}
 
       - name: Terraform Destroy (cleanup)
