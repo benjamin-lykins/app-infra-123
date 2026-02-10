@@ -3,24 +3,31 @@ name: Terraform Plan + Apply (CLI-driven)
 on:
   workflow_dispatch:
     inputs:
+      terraform-action:
+        type: choice
+        description: Choose Terraform action to perform
+        options:
+        - apply: Run Terraform Plan followed by Apply (requires approval)
+        - plan-only: Run only Terraform Plan (no approval needed)
+        - destroy: Run Terraform Destroy (cleanup, approval needed)
+        default: plan-only
       terraform-approve:
-        type: boolean
-        description: Approve Terraform Apply 
+        description: Run Terraform Apply after Plan (requires approval)
         default: false
       # terraform-plan-artifact:
       #   type: string
       #   description: Terraform Plan artifact name (from previous workflow)
       #   default: ""
 
-jobs:
-  terraform-cli-run:
-    runs-on: ubuntu-latest
+env:
+  TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }} 
+  TF_CONFIG_DIR: ./                                                   
+  TF_WORKSPACE: app-infra-123-vm                                     
 
-    env:
-      TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }} # TFC API token
-      TF_CONFIG_DIR: ./                                                   # Path to Terraform files
-      TF_WORKSPACE: app-infra-123-vm                                     # Workspace name
-    
+jobs:
+  terraform-plan:
+    runs-on: ubuntu-latest
+   
     defaults:
       run:
         working-directory: ${{ env.TF_CONFIG_DIR }}
@@ -52,6 +59,10 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -var-file=tfvars/app-infra-123-dev.tfvars -input=false -out=${{ github.run_id }}.tfplan
 
+      - name: Terraform Destroy (cleanup)
+        if: ${{ inputs.terraform-approve == false }}
+        run: terraform destroy -var-file=tfvars/app-infra-123-dev.tfvars -auto-approve -input=false
+
       - name: Read file content
         id: get_file_content
         run: |
@@ -60,6 +71,7 @@ jobs:
         shell: bash
 
       - name: Wait for approval
+        if: ${{ inputs.terraform-action == 'apply' || inputs.terraform-action == 'destroy' }}
         uses: trstringer/manual-approval@v1
         with:
           secret: ${{ github.TOKEN }}
@@ -72,5 +84,5 @@ jobs:
             ${{ steps.get_file_content.outputs.content }}
 
       - name: Terraform Apply
-        if: ${{ inputs.terraform-approve == true }}
+        if: ${{ inputs.terraform-action == 'apply' || inputs.terraform-action == 'destroy' }}
         run: terraform apply -auto-approve -input=false -var-file=tfvars/app-infra-123-dev.tfvars ${{ github.run_id }}.tfplan
