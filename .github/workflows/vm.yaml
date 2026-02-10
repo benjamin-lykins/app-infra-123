@@ -7,10 +7,10 @@ on:
         type: boolean
         description: Approve Terraform Apply 
         default: false
-      terraform-plan-artifact:
-        type: string
-        description: Terraform Plan artifact name (from previous workflow)
-        default: ""
+      # terraform-plan-artifact:
+      #   type: string
+      #   description: Terraform Plan artifact name (from previous workflow)
+      #   default: ""
 
 jobs:
   terraform-cli-run:
