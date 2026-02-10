@@ -7,17 +7,10 @@ on:
         type: choice
         description: Choose Terraform action to perform
         options:
-        - apply: Run Terraform Plan followed by Apply (requires approval)
-        - plan-only: Run only Terraform Plan (no approval needed)
-        - destroy: Run Terraform Destroy (cleanup, approval needed)
+        - apply
+        - plan-only
+        - destroy
         default: plan-only
-      terraform-approve:
-        description: Run Terraform Apply after Plan (requires approval)
-        default: false
-      # terraform-plan-artifact:
-      #   type: string
-      #   description: Terraform Plan artifact name (from previous workflow)
-      #   default: ""
 
 env:
   TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }} 
