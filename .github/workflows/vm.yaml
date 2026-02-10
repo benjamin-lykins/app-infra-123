@@ -52,9 +52,7 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -var-file=tfvars/app-infra-123-dev.tfvars -input=false -out=${{ github.run_id }}.tfplan
 
-      - name: Terraform Destroy (cleanup)
-        if: ${{ inputs.terraform-approve == false }}
-        run: terraform destroy -var-file=tfvars/app-infra-123-dev.tfvars -auto-approve -input=false
+  
 
       - name: Read file content
         id: get_file_content
@@ -75,6 +73,10 @@ jobs:
 
 
             ${{ steps.get_file_content.outputs.content }}
+
+      - name: Terraform Destroy (cleanup)
+        if: ${{ inputs.terraform-action == 'destroy' }}
+        run: terraform destroy -var-file=tfvars/app-infra-123-dev.tfvars -auto-approve -input=false
 
       - name: Terraform Apply
         if: ${{ inputs.terraform-action == 'apply' || inputs.terraform-action == 'destroy' }}
