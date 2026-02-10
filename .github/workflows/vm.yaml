@@ -51,10 +51,14 @@ jobs:
 
       - name: Terraform Plan
         run: terraform plan -var-file=tfvars/app-infra-123-dev.tfvars -input=false -out=${{ github.run_id }}.tfplan
-
-  
+      
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.run_id }}.tfplan
+          path: ${{ github.run_id }}.tfplan  
 
       - name: Read file content
+        if: ${{ inputs.terraform-action == 'apply' || inputs.terraform-action == 'destroy' }}
         id: get_file_content
         run: |
           FILE_CONTENT=$(cat ${{ github.run_id }}.tfplan)
