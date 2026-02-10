@@ -22,7 +22,7 @@ on:
 env:
   TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }} 
   TF_CONFIG_DIR: ./                                                   
-  TF_WORKSPACE: app-infra-123-vm                                     
+  TF_WORKSPACE: app-infra-123-${{ inputs.environment }}                                     
 
 jobs:
   terraform-plan:
@@ -57,7 +57,7 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -var-file=tfvars/app-infra-123-dev.tfvars -input=false -out=${{ github.run_id }}.tfplan
+        run: terraform plan -var-file=tfvars/app-infra-123-${{ inputs.environment }}.tfvars -input=false -out=${{ github.run_id }}.tfplan
       
       - uses: actions/upload-artifact@v4
         with:
@@ -97,10 +97,10 @@ jobs:
 
       - name: Terraform Destroy
         if: ${{ inputs.terraform-action == 'destroy' }}
-        run: terraform destroy -var-file=tfvars/app-infra-123-dev.tfvars -auto-approve -input=false
+        run: terraform destroy -var-file=tfvars/app-infra-123-${{ inputs.environment }}.tfvars -auto-approve -input=false
 
       - name: Terraform Apply
         if: ${{ inputs.terraform-action == 'apply' || inputs.terraform-action == 'destroy' }}
-        run: terraform apply -auto-approve -input=false -var-file=tfvars/app-infra-123-dev.tfvars ${{ github.run_id }}.tfplan
+        run: terraform apply -auto-approve -input=false -var-file=tfvars/app-infra-123-${{ inputs.environment }}.tfvars ${{ github.run_id }}.tfplan
 
   
