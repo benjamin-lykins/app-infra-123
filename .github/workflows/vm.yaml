@@ -11,6 +11,13 @@ on:
         - plan-only
         - destroy
         default: plan-only
+      environment:
+        type: choice
+        description: Choose environment to deploy to
+        options:
+        - dev
+        - prod
+        default: dev
 
 env:
   TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }} 
