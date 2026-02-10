@@ -10,7 +10,7 @@ jobs:
     env:
       TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }} # TFC API token
       TF_CONFIG_DIR: ./                                                   # Path to Terraform files
-      TF_WORKSPACE: app-infra-123-vm                                  # Workspace name
+      TF_WORKSPACE: app-infra-123-vm.                                     # Workspace name
     
     defaults:
       run:
@@ -41,7 +41,7 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan
+        run: terraform plan -var-file=tfvars/app-infra-123-dev.tfvars -input=false
       
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -var-file=tfvars/app-infra-123-dev.tfvars -input=false
