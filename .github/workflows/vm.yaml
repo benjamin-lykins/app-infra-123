@@ -1,0 +1,42 @@
+name: Terraform Plan + Apply (CLI-driven)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  terraform-cli-run:
+    runs-on: ubuntu-latest
+
+    env:
+      TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }} # TFC API token
+      TF_CONFIG_DIR: ./                                                   # Path to Terraform files
+      TF_WORKSPACE: app-infra-123-vm                                  # Workspace name
+    
+    defaults:
+      run:
+        working-directory: ${{ env.TF_CONFIG_DIR }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          repository: benjamin-lykins/infra-aws
+          sparse-checkout: blueprints/vm
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan
+      
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
