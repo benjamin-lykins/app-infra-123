@@ -2,6 +2,15 @@ name: Terraform Plan + Apply (CLI-driven)
 
 on:
   workflow_dispatch:
+    inputs:
+      terraform-approve:
+        type: boolean
+        description: Approve Terraform Apply 
+        default: false
+      terraform-plan-artifact:
+        type: string
+        description: Terraform Plan artifact name (from previous workflow)
+        default: ""
 
 jobs:
   terraform-cli-run:
@@ -48,5 +57,13 @@ jobs:
           name: ${{ github.run_id }}.tfplan
           path: ${{ github.run_id }}.tfplan
 
-      # - name: Terraform Apply
-      #   run: terraform apply -auto-approve -var-file=tfvars/app-infra-123-dev.tfvars  -input=false ${{ github.run_id }}.tfplan
+      - name: Wait for approval
+        uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: benjamin-lykins
+          minimum-approvals: 1
+
+      - name: Terraform Apply
+        if: ${{ inputs.terraform-approve == 'true' }}
+        run: terraform apply -auto-approve -input=false -var-file=tfvars/app-infra-123-dev.tfvars ${{ github.run_id }}.tfplan
