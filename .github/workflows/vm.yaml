@@ -52,10 +52,12 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -var-file=tfvars/app-infra-123-dev.tfvars -input=false -out=${{ github.run_id }}.tfplan
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: ${{ github.run_id }}.tfplan
-          path: ${{ github.run_id }}.tfplan
+      - name: Read file content
+        id: get_file_content
+        run: |
+          FILE_CONTENT=$(cat ${{ github.run_id }}.tfplan)
+          echo "content=$FILE_CONTENT" >> "$GITHUB_OUTPUT"
+        shell: bash
 
       - name: Wait for approval
         uses: trstringer/manual-approval@v1
@@ -63,7 +65,12 @@ jobs:
           secret: ${{ github.TOKEN }}
           approvers: benjamin-lykins
           minimum-approvals: 1
+          issue-body: |
+            "Terraform Plan is ready for review. Please approve to proceed with Terraform Apply."
+
+
+            ${{ steps.get_file_content.outputs.content }}
 
       - name: Terraform Apply
-        if: ${{ inputs.terraform-approve == 'true' }}
+        if: ${{ inputs.terraform-approve == true }}
         run: terraform apply -auto-approve -input=false -var-file=tfvars/app-infra-123-dev.tfvars ${{ github.run_id }}.tfplan
