@@ -10,7 +10,7 @@ jobs:
     env:
       TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }} # TFC API token
       TF_CONFIG_DIR: ./                                                   # Path to Terraform files
-      TF_WORKSPACE: app-infra-123-vm.                                     # Workspace name
+      TF_WORKSPACE: app-infra-123-vm                                     # Workspace name
     
     defaults:
       run:
