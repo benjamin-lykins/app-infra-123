@@ -17,14 +17,19 @@ jobs:
         working-directory: ${{ env.TF_CONFIG_DIR }}
 
     steps:
-      - name: Checkout
+      - name: Checkout (current repo)
         uses: actions/checkout@v6
 
-      - name: Checkout
+      - name: Checkout (blueprint repo)
         uses: actions/checkout@v6
         with:
           repository: benjamin-lykins/infra-aws
           sparse-checkout: blueprints/vm
+          path: infra-aws
+
+      - name: Copy VM blueprint into repo root
+        run: |
+          rsync -a infra-aws/blueprints/vm/ ./
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
