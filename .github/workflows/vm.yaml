@@ -64,17 +64,6 @@ jobs:
           name: ${{ github.run_id }}.tfplan
           path: ${{ github.run_id }}.tfplan  
 
-  terraform-apply:
-    if: ${{ inputs.terraform-action == 'apply' || inputs.terraform-action == 'destroy' }}
-    needs: terraform-plan
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download tfplan artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ github.run_id }}.tfplan
-          path: ${{ github.run_id }}.tfplan
-
       - name: Read tfplan file content
         id: read_tfplan
         run: |
