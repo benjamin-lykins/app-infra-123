@@ -1,0 +1,57 @@
+name: Terraform Workflow
+
+on:
+  pull_request:
+    branches:
+      - main
+                        
+
+jobs:
+  strategy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        terraform-action: [plan-only]
+        environment: [dev, prod]
+    env:
+      TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }} 
+      TF_CONFIG_DIR: ./                                                   
+      TF_WORKSPACE: app-infra-123-vm-${{ matrix.environment }}
+  terraform-plan:
+    runs-on: ubuntu-latest
+   
+    defaults:
+      run:
+        working-directory: ${{ env.TF_CONFIG_DIR }}
+
+    steps:
+      - name: Checkout (current repo)
+        uses: actions/checkout@v6
+
+      - name: Checkout (blueprint repo)
+        uses: actions/checkout@v6
+        with:
+          repository: benjamin-lykins/infra-aws
+          sparse-checkout: blueprints/vm
+          path: infra-aws
+
+      - name: Copy VM blueprint into repo root
+        run: |
+          rsync -a infra-aws/blueprints/vm/ ./
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -var-file=tfvars/app-infra-123-vm-${{ matrix.environment }}.tfvars -input=false -out=${{ matrix.environment }}-${{ github.run_id }}.tfplan
+      
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.environment }}-${{ github.run_id }}.tfplan
+          path: ${{ matrix.environment }}-${{ github.run_id }}.tfplan  
