@@ -85,12 +85,6 @@ jobs:
 
             ${{ steps.read_tfplan.outputs.content }}
       
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-      
-      - name: Terraform Init
-        run: terraform init -input=false
-
       - name: Terraform Destroy
         if: ${{ inputs.terraform-action == 'destroy' }}
         run: terraform destroy -var-file=tfvars/common.tfvars -var-file=tfvars/app-infra-123-vm-${{ inputs.environment }}.tfvars -auto-approve -input=false
