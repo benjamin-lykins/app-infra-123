@@ -25,7 +25,7 @@ env:
   TF_WORKSPACE: app-infra-123-vm-${{ inputs.environment }}                                     
 
 jobs:
-  terraform-plan:
+  terraform:
     runs-on: ubuntu-latest
    
     defaults:
