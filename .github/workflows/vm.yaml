@@ -73,6 +73,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ github.run_id }}.tfplan
+          path: ${{ github.run_id }}.tfplan
 
       - name: Read tfplan file content
         id: read_tfplan
@@ -94,6 +95,12 @@ jobs:
             "Terraform Plan is ready for review. Please approve to proceed with Terraform Apply."
 
             ${{ steps.read_tfplan.outputs.content }}
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+      
+      - name: Terraform Init
+        run: terraform init -input=false
 
       - name: Terraform Destroy
         if: ${{ inputs.terraform-action == 'destroy' }}
