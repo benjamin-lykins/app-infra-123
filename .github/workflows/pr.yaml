@@ -1,6 +1,7 @@
-name: Terraform Workflow
+name: Pull Request
 
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - main
