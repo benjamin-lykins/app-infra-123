@@ -91,5 +91,5 @@ jobs:
 
       - name: Terraform Apply
         if: ${{ inputs.terraform-action == 'apply' }}
-        run: terraform apply -auto-approve -input=false -var-file=tfvars/common.tfvars -var-file=tfvars/app-infra-123-vm-${{ inputs.environment }}.tfvars ${{ github.run_id }}.tfplan
+        run: terraform apply -auto-approve -input=false -var-file=tfvars/common.tfvars -var-file=tfvars/app-infra-123-vm-${{ inputs.environment }}.tfvars
   
